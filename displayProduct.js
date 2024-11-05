@@ -1,17 +1,23 @@
 export async function fetchProducts() {
+    const productContainer = document.getElementById("product-container");
+    const searchContainer = document.getElementById("search-input");
     try{
         const res = await fetch ("https://fakestoreapi.com/products")
-        console.log(res);
         const json = await res.json();
-        console.log(json);
-        displayProducts(json);
-        console.log("Success: ", json);
+        if(json.length > 0)
+        {
+            displayProducts(json);
+            searchContainer.addEventListener("input", (event) => {
+                filterProducts(json, event.target.value);
+            });
+        }
     } catch(error) {
         console.error('Error: ', error);
-    } 
+    }
 }
 function displayProducts(products) {
     const productContainer = document.getElementById("product-container");
+    productContainer.innerHTML = "";
     products.forEach(product => {
         const productCard = document.createElement("div");
         productCard.classList.add("product-card");
@@ -31,4 +37,13 @@ function displayProducts(products) {
         productCard.appendChild(productDescription);
         productContainer.appendChild(productCard);
     });
+}
+function filterProducts(products, searchedProduct) {
+    const filteredProduct = products.filter(product => {
+        const lowercase = searchedProduct.toLowerCase();
+        return (
+            product.title.toLowerCase().includes(lowercase)
+        );
+    });
+    displayProducts(filteredProduct);
 }
